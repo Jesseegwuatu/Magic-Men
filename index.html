@@ -205,6 +205,28 @@ footer { text-align: center; padding: 30px; font-size: 11px; color: #444; backgr
 .membership-buy-btn { background: var(--green-btn); color: #000; padding: 10px 18px; font-size: 11px; font-weight: 900; text-transform: uppercase; border: none; border-radius: 6px; cursor: pointer; transition: var(--transition); white-space: nowrap; }
 .membership-buy-btn:hover { background: #fff; box-shadow: 0 0 10px rgba(163,230,53,0.5); }
 
+/* MEET & GREET LIST MODAL */
+.meetgreet-list { display: flex; flex-direction: column; gap: 12px; }
+.meetgreet-item { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; padding: 15px; transition: var(--transition); }
+.meetgreet-item:hover { background: rgba(212,175,55,0.1); border-color: var(--gold); }
+.meetgreet-info { flex-grow: 1; }
+.meetgreet-duration { font-size: 15px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+.meetgreet-price { font-size: 13px; font-weight: 700; color: var(--gold-light); margin-top: 3px; }
+.meetgreet-arrow-btn { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(212,175,55,0.15); border: 2px solid var(--gold); color: var(--gold); font-size: 16px; flex-shrink: 0; transition: var(--transition); cursor: pointer; position: relative; overflow: hidden; }
+.meetgreet-arrow-btn::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: var(--gold); transform: translate(-50%, -50%); transition: width 0.4s ease, height 0.4s ease; z-index: 0; }
+.meetgreet-arrow-btn i { position: relative; z-index: 1; transition: var(--transition); }
+.meetgreet-arrow-btn:hover { border-color: var(--gold); transform: scale(1.1); box-shadow: 0 0 20px rgba(212,175,55,0.5); }
+.meetgreet-arrow-btn:hover::before { width: 100%; height: 100%; }
+.meetgreet-arrow-btn:hover i { color: #000; transform: translateX(3px); }
+
+/* PULSE ANIMATION FOR ARROW BUTTON */
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.6); }
+    70% { box-shadow: 0 0 0 12px rgba(212,175,55,0); }
+    100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+}
+.meetgreet-arrow-btn { animation: pulse-gold 2s infinite; }
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .services-grid { grid-template-columns: 1fr 1fr; }
@@ -224,6 +246,8 @@ footer { text-align: center; padding: 30px; font-size: 11px; color: #444; backgr
     .stripper-chat-btn { width: 100%; }
     .membership-item { flex-direction: column; text-align: center; }
     .membership-buy-btn { width: 100%; }
+    .meetgreet-item { flex-direction: column; text-align: center; }
+    .meetgreet-arrow-btn { width: 50px; height: 50px; }
 }
 </style>
 </head>
@@ -281,11 +305,11 @@ footer { text-align: center; padding: 30px; font-size: 11px; color: #444; backgr
         <div class="service-icon"><i class="fa-solid fa-bowtie"></i></div>
         <div class="service-label">Male<br>Strippers</div>
     </div>
-    <!-- Online Shop -> Management -->
-    <a href="https://t.me/magicmenAustraliamanagementteam" target="_blank" class="service-card">
-        <div class="service-icon"><i class="fa-solid fa-gift"></i></div>
-        <div class="service-label">Online<br>Shop</div>
-    </a>
+    <!-- Meet & Greet -> Opens Meet & Greet Modal -->
+    <div class="service-card" id="meetGreetTrigger">
+        <div class="service-icon"><i class="fa-solid fa-handshake"></i></div>
+        <div class="service-label">Meet<br>& Greet</div>
+    </div>
 </section>
 
 <section class="performers-section">
@@ -565,6 +589,19 @@ footer { text-align: center; padding: 30px; font-size: 11px; color: #444; backgr
     </div>
 </div>
 
+<!-- MODAL: MEET & GREET LIST (Meet & Greet Quick Service) -->
+<div class="modal-overlay" id="meetGreetModalOverlay">
+    <div class="modal-content">
+        <button class="modal-close" id="meetGreetModalClose"><i class="fa-solid fa-times"></i></button>
+        <div class="modal-body" style="padding-top: 40px;">
+            <div class="modal-name" style="text-align:center; margin-bottom:20px;">MEET & GREET PACKAGES</div>
+            <div class="meetgreet-list" id="meetGreetListContainer">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -695,6 +732,17 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* ============================================================
+       MEET & GREET DATA
+       ============================================================ */
+    const meetGreets = [
+        { duration: "3 Days", price: "$2000" },
+        { duration: "1 Week", price: "$5000" },
+        { duration: "1 Month", price: "$15000" },
+        { duration: "2 Months", price: "$25000" },
+        { duration: "Life Time Retirement", price: "$75000" }
+    ];
+
+    /* ============================================================
        RENDER PERFORMER CARDS
        ============================================================ */
     const grid = document.getElementById('performersGrid');
@@ -776,7 +824,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="stripper-info">
                 <div class="stripper-name">${p.name}</div>
             </div>
-            <!-- Chat Now -> Original Telegram (Celebrity Chat) -->
             <a href="https://t.me/official1willparfit" target="_blank" class="stripper-chat-btn">CHAT NOW</a>
         `;
         stripperListContainer.appendChild(item);
@@ -814,7 +861,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="membership-tier-name">${m.tier}</div>
                 <div class="membership-tier-price">${m.price}</div>
             </div>
-            <!-- Buy Now -> Management Telegram -->
             <a href="https://t.me/magicmenAustraliamanagementteam" target="_blank" class="membership-buy-btn">BUY NOW</a>
         `;
         membershipListContainer.appendChild(item);
@@ -835,11 +881,51 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target === membershipModalOverlay) closeMembershipModal();
     });
 
+    /* ============================================================
+       MODAL: MEET & GREET LIST (Meet & Greet Quick Service)
+       ============================================================ */
+    const meetGreetTrigger = document.getElementById('meetGreetTrigger');
+    const meetGreetModalOverlay = document.getElementById('meetGreetModalOverlay');
+    const meetGreetModalClose = document.getElementById('meetGreetModalClose');
+    const meetGreetListContainer = document.getElementById('meetGreetListContainer');
+
+    meetGreets.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'meetgreet-item';
+        item.innerHTML = `
+            <div class="meetgreet-info">
+                <div class="meetgreet-duration">${m.duration}</div>
+                <div class="meetgreet-price">${m.price}</div>
+            </div>
+            <!-- Animated Arrow Button -> Management Telegram -->
+            <a href="https://t.me/magicmenAustraliamanagementteam" target="_blank" class="meetgreet-arrow-btn">
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        `;
+        meetGreetListContainer.appendChild(item);
+    });
+
+    function openMeetGreetModal() {
+        meetGreetModalOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeMeetGreetModal() {
+        meetGreetModalOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    meetGreetTrigger.addEventListener('click', openMeetGreetModal);
+    meetGreetModalClose.addEventListener('click', closeMeetGreetModal);
+    meetGreetModalOverlay.addEventListener('click', function(e) {
+        if (e.target === meetGreetModalOverlay) closeMeetGreetModal();
+    });
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
             closeStripperModal();
             closeMembershipModal();
+            closeMeetGreetModal();
         }
     });
 
